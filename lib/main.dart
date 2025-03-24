@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'api_service.dart';
+import 'login_screen.dart';
+import 'register_screen.dart';
 
 void main() async {
-  await dotenv.load(fileName: ".env"); // Cargar variables de entorno
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -17,10 +19,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'ToDo List'),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const LoginScreen(),
+        '/home': (context) => const MyHomePage(title: 'ToDo List'),
+        '/register': (context) => const RegisterScreen(),
+      },
     );
   }
 }
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -110,12 +118,25 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _logout() async {
+    await ApiService.logout();
+    Navigator.pushReplacementNamed(context, '/');
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Cerrar sesión',
+          ),
+        ],
       ),
       body: tasks.isEmpty
           ? const Center(
